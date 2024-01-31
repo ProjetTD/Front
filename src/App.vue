@@ -1,5 +1,5 @@
 <template>
-  <nav class="relative px-6 z-[99] uppercase">
+  <nav class="relative px-6 z-[50] uppercase">
     <router-link to="/"><img class="w-[60px]" src="./assets/images/logo.png"></router-link>
     <router-link to="/">Accueil</router-link>
     <router-link to="/player">Jeux</router-link>

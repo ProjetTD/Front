@@ -1,7 +1,3 @@
-.absoluteCenter {
-  @apply top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
-}
-
 .fadeTransition {
   &-enter-active,
   &-leave-active {
@@ -46,10 +42,7 @@
     &:focus-within {
       @apply
       border-2
-      border-t-white/20
-      border-r-white/20
-      border-l-white/20
-      border-b-[#ffffff]
+      border-[#9e9e9e]
     }
 
     img, svg:not(.eye) {
@@ -72,7 +65,7 @@
     }
 
     input {
-      @apply bg-transparent outline-none pl-6 w-full lg:w-96;
+      @apply bg-transparent outline-none pl-[1rem] w-full lg:w-96;
       background-clip: content-box;
 
       &::placeholder {

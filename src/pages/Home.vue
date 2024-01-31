@@ -17,8 +17,8 @@
     </div>
     <transition name="fadeTransition">
       <div v-show="popup"
-           class="z-50 absoluteCenter h-full gap-14 flex-col fixed w-full bg-black/90 text-white top-0 left-0 flex items-center text-center pt-24">
-        <div class="relative w-4/5 lg:w-1/3 flex items-center justify-center gap-6">
+           class="z-[99] justify-center h-full gap-14 flex-col absolute lg:fixed w-full bg-black text-white top-0 left-0 flex items-center text-center">
+        <div class="relative w-4/5 lg:w-1/3 flex items-center justify-center gap-4">
           <img class="mt-6 w-10 h-10" src="@/assets/images/player/more.svg" />
           <h1 class="mt-6 font-black text-[1rem] lg:text-[1.5rem] z-10 uppercase">Création de la partie</h1>
           <button
@@ -28,8 +28,11 @@
           </button>
         </div>
         <div class="flex items-center flex-col w-4/5 lg:w-1/3 gap-7">
-          <span class="title">
-            Avant de lancer la partie, merci de renseigner votre pseudonyme.
+          <span>
+            Avant de commencer une partie, merci de renseigner votre pseudonyme.
+            <br>
+            <br>
+            <i class="opacity-60">(Si vous rechargez la page, votre session sera perdue ainsi que toutes les données reliées au compte)</i>
           </span>
           <div class="input-container !w-full flex flex-col gap-4">
             <div class="content !rounded-lg">
@@ -39,7 +42,7 @@
             </div>
           </div>
           <div class="w-full flex flex-col gap-4 justify-center items-center">
-            <button class="button w-[230px] h-[50px] font-bold uppercase border-white border-[1px] rounded-md" v-on:click="createPlayer(pseudo)">Jouer</button>
+            <button class="button w-[230px] h-[50px] font-bold uppercase border-white border-[1px] rounded-md" v-on:click="createPlayer(pseudo)">Commencer</button>
           </div>
         </div>
       </div>
@@ -55,6 +58,7 @@ export default {
     return {
       popup: false,
       pseudo: null,
+      id: localStorage.getItem('userIdSession') || ''
     }
   },
   methods: {
@@ -66,13 +70,21 @@ export default {
         alert('Votre pseudo doit contenir au moins 3 caractères !')
         return
       }
+
+      localStorage.setItem('userPseudo', pseudo);
+
       this.$api.post('/players', {
         name: pseudo,
         score: 0,
         level: 0,
         ressources: 100,
-      }).catch((error) => {
-        console.log(error)
+      })
+      .then((response) => {
+        localStorage.setItem('userIdSession', response.data.id);
+        this.$router.push('/player')
+      })
+      .catch((error) => {
+        console.log(error.response.data.detail.code)
       })
     }
   }
