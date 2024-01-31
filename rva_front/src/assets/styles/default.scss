@@ -1,1 +1,91 @@
-@import './tailwind.scss';
+.absoluteCenter {
+  @apply top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
+}
+
+.fadeTransition {
+  &-enter-active,
+  &-leave-active {
+    transition: opacity .5s;
+  }
+
+  &-enter-active {
+    animation: fadeTransit ease .5s;
+  }
+
+  &-enter,
+  &-leave-to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeTransit {
+  0% {
+    margin-top: -15px;
+    opacity:0;
+  }
+  100% {
+    margin-top: 0;
+    opacity:1;
+  }
+}
+
+.input-container {
+
+  @apply w-full lg:w-auto;
+
+  .content {
+    & {
+      @apply flex flex-row gap-[1rem] relative items-center
+      bg-[#0C0C0C]
+      px-[1rem] py-2 w-full
+      border-2 border-white border-opacity-20
+      divide-x-2 divide-white divide-opacity-20
+      transition-all ease-in-out;
+    }
+
+    &:focus-within {
+      @apply
+      border-2
+      border-t-white/20
+      border-r-white/20
+      border-l-white/20
+      border-b-[#ffffff]
+    }
+
+    img, svg:not(.eye) {
+      @apply h-8 w-8;
+    }
+
+    .icon {
+      @apply
+      absolute right-6
+      top-1/2 transform cursor-pointer
+      -translate-y-1/2 h-5 z-20 w-5;
+
+      .eye {
+        @apply opacity-50;
+
+        &:hover {
+          @apply opacity-100;
+        }
+      }
+    }
+
+    input {
+      @apply bg-transparent outline-none pl-6 w-full lg:w-96;
+      background-clip: content-box;
+
+      &::placeholder {
+        @apply text-white opacity-20;
+      }
+
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus,
+      &:-webkit-autofill:active {
+        transition: background-color 5000s ease-in-out 0s;
+        -webkit-text-fill-color: #fff !important;
+      }
+    }
+  }
+}

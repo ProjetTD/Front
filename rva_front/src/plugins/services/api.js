@@ -12,7 +12,14 @@ class Api {
         } : {});
     }
 
+    patch(path, data, session, config) {
+        return axios.patch(this.url + path, data, session ? {
+            ...config
+        } : {});
+    }
+
     post(path, data, config) {
+        console.log(this.url + path, data, config);
         return axios.post(this.url + path, data, config);
     }
 
