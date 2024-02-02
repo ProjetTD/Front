@@ -19,7 +19,6 @@ class Api {
     }
 
     post(path, data, config) {
-        console.log(this.url + path, data, config);
         return axios.post(this.url + path, data, config);
     }
 
