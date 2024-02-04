@@ -1,28 +1,21 @@
 <template>
-  <div v-if="pseudo !== undefined && pseudo">
-    <p>Bienvenue {{ pseudo }} !</p>
-    <board></board>
+  <div v-if="user.name !== undefined && user.name" class="h-screen w-full flex items-center justify-center flex-col gap-6">
+    <p>Bienvenue {{ user.name }} !</p>
   </div>
 </template>
 
 <script>
-import Board from '@/components/player/Board.vue'
 import store from '@/store';
 
 export default {
   name: 'Player',
-  components: {
-    Board
-  },
+  components: {},
   data() {
     return {}
   },
   computed: {
-    uid() {
-      return this.getCookie('uid') || store.state.uid;
-    },
-    pseudo() {
-      return store.state.pseudo;
+    user() {
+      return store.state.user;
     },
   },
   methods: {
@@ -35,10 +28,6 @@ export default {
         console.log(error.response.data.detail.code)
       })
     },
-    setCookie(name, value) {
-      document.cookie = `${name}=${value}; path=/`;
-    },
-    
     getCookie(name) {
       const cookies = document.cookie.split('; ');
       for (const cookie of cookies) {
@@ -51,9 +40,6 @@ export default {
     },
   },
   mounted() {
-    setInterval(() => {
-      store.commit('setScore', store.state.score + 10000);
-    }, 600);
     if(store.state.uid !== null) {
       this.getPlayer()
     } else {

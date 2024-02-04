@@ -1,18 +1,28 @@
 <template>
   <nav class="relative px-6 z-[50]">
     <div class="flex items-center gap-[30px] uppercase">
-      <router-link to="/"><img class="w-[60px]" src="./assets/images/logo.png"></router-link>
-      <router-link to="/">Accueil</router-link>
-      <router-link v-if="uid" to="/player">Jeux</router-link>
+      <img class="w-[60px]" src="./assets/images/brand/logo.png">
+      <router-link to="/">
+        <svg class="h-6 duration-200" fill="#a5a5a5" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-door-box">
+          <path d="M13,14H11V12H13ZM16,18H17V17H18V5H17V4H5V5H4V17H5V18H6V6H16ZM18,20H4V19H3V18H2V4H3V3H4V2H18V3H19V4H20V18H19V19H18ZM14,18V8H8V18Z" />
+        </svg>
+        <p>Accueil</p>
+      </router-link>
+      <router-link v-if="user.uid" to="/player">
+        <svg class="h-6 duration-200" fill="#a5a5a5" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-device">
+          <path d="M2 1H20V2H20.94V20H20V21H2V20H1.06V2H2V1M3 3V19H19V3H3M4 4H18V12H4V4M5 14H8V17H5V14M12 15H14V17H12V15M15 14H17V16H15V14Z" />
+        </svg>
+        <p>Jeux</p>
+      </router-link>
     </div>
-    <div v-if="uid && pseudo" class="flex items-center gap-[30px]">
+    <div v-if="user.uid && user.name" class="flex items-center gap-[30px]">
       <div class="flex items-center justify-center gap-2 border-white border-[1px] rounded-xl px-3 py-2">
         <img title="Pseudo" class="h-6" src="@/assets/images/player/account.svg">
-        <a title="Pseudo" class="font-normal">{{ pseudo }}</a>
+        <p title="Pseudo" class="font-normal">{{ user.name }}</p>
         <img title="Ressources" class="h-6" src="@/assets/images/player/ressources.svg">
-        <a title="Ressources" class="font-normal">{{ ressources }}</a>
+        <p title="Ressources" class="font-normal">{{ user.ressources }}</p>
         <img title="Score" class="h-6" src="@/assets/images/player/score.svg">
-        <a title="Score" class="font-normal">{{ score }}</a>
+        <p title="Score" class="font-normal">{{ user.score }}</p>
       </div>
       <button class="font-normal flex items-center justify-center gap-2 border-white border-[1px] rounded-xl px-2 py-2 hover:text-black hover:bg-white duration-200" v-on:click="removeSession">
         <svg class="h-6" fill="#ffffff" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-arrow-left-circle">
@@ -32,33 +42,35 @@
   </nav>
   <transition name="fadeTransition">
     <div v-show="popup"
-          class="z-[99] justify-center h-full gap-14 flex-col absolute lg:fixed w-full bg-black/95 text-white top-0 left-0 flex items-center text-center">
-      <div class="relative w-4/5 lg:w-1/3 flex items-center justify-center gap-4">
-        <img class="mt-12 w-10 h-10" src="@/assets/images/player/more.svg" />
-        <h1 class="mt-12 font-black text-[1rem] lg:text-[1.5rem] z-10 uppercase">Création de la partie</h1>
-        <button
-          class="absolute top-0 left-0 p-2 w-8 border border-gray-500 h-8 bg-black/70"
-          v-on:click="popup = false">
-          <img src="@/assets/images/player/cross.svg" />
-        </button>
-      </div>
-      <div class="flex items-center flex-col w-4/5 lg:w-1/3 gap-7">
-        <span>
-          <p class="font-medium">Avant de commencer une partie, merci de renseigner votre pseudonyme.</p>
-          <br>
-          <br>
-          <i class="opacity-60">(Si vous vous déconnectez vous pouvez rentrer le pseudo que vous avez utilisé la dernière fois que vous avez joué, sinon veuillez créer un compte)</i>
-        </span>
-        <div class="input-container !w-full flex flex-col gap-4">
-          <p class="uppercase font-bold">Créer un compte / Se connecter</p>
-          <div class="content !rounded-lg">
-            <img class="opacity-70 h-14" src="@/assets/images/player/account.svg">
-            <input class="!w-full" id="title"
-              placeholder="Ecrivez votre pseudo..." type="text" v-model="inputPseudo" />
-          </div>
+          class="z-[99] justify-center h-full gap-8 flex-col absolute lg:fixed w-full bg-black/95 text-white top-0 left-0 flex items-center text-center">
+      <div class="w-4/5 lg:w-2/5 flex flex-col items-center justify-center border-[1px] border-white/30 rounded-lg p-8 bg-black/70 gap-10">
+        <div class="relative w-full flex items-center justify-center gap-4">
+          <img class="mt-12 w-10 h-10" src="@/assets/images/player/more.svg" />
+          <h1 class="mt-12 font-black text-[1rem] lg:text-[1.5rem] z-10 uppercase">Création de la partie</h1>
+          <button
+            class="absolute top-0 left-0 w-8 rounded-md border border-gray-500 h-8 bg-black/70 hover:border-white duration-200"
+            v-on:click="popup = false">
+            <img src="@/assets/images/player/cross.svg" />
+          </button>
         </div>
-        <div class="w-full flex flex-col gap-4 justify-center items-center">
-          <button class="button w-[230px] h-[50px] font-bold uppercase border-white border-[1px] rounded-md" v-on:click="createPlayer(inputPseudo)">Commencer</button>
+        <div class="flex items-center flex-col w-full gap-7">
+          <span>
+            <p class="font-medium">Avant de commencer une partie, merci de renseigner votre pseudonyme.</p>
+            <br>
+            <br>
+            <i class="opacity-60">(Si vous vous déconnectez vous pouvez rentrer le pseudo que vous avez utilisé la dernière fois que vous avez joué, sinon veuillez créer un compte)</i>
+          </span>
+          <div class="input-container !w-full flex flex-col gap-4">
+            <p class="uppercase font-bold">Créer un compte / Se connecter</p>
+            <div class="content !rounded-lg">
+              <img class="opacity-70 h-14" src="@/assets/images/player/account.svg">
+              <input class="!w-full" id="title"
+                placeholder="Ecrivez votre pseudo..." type="text" v-model="inputPseudo" />
+            </div>
+          </div>
+          <div class="w-full flex flex-col gap-4 justify-center items-center">
+            <button class="button w-[230px] h-[50px] font-bold uppercase border-white border-[1px] rounded-md" v-on:click="createPlayer(inputPseudo)">Commencer</button>
+          </div>
         </div>
       </div>
     </div>
@@ -79,17 +91,8 @@ export default {
     }
   },
   computed: {
-    uid() {
-      return this.getCookie('uid') || store.state.uid;
-    },
-    pseudo() {
-      return store.state.pseudo;
-    },
-    ressources() {
-      return store.state.ressources;
-    },
-    score() {
-      return store.state.score;
+    user() {
+      return store.state.user;
     },
   },
   methods: {
@@ -111,10 +114,7 @@ export default {
       .then((response) => {
         this.setCookie('uid', response.data.uid);
 
-        store.commit('setUid', response.data.uid);
-        store.commit('setPseudo', pseudo);
-        store.commit('setRessources', response.data.ressources);
-        store.commit('setScore', response.data.score);
+        store.commit('setUser', response.data);
 
         this.$router.push('/player')
       })
@@ -124,11 +124,9 @@ export default {
           .then((response) => {
             this.setCookie('uid', response.data.uid);
 
-            store.commit('setUid', response.data.uid);
-            store.commit('setPseudo', response.data.name);
-            store.commit('setRessources', response.data.ressources);
-            store.commit('setScore', response.data.score);
+            store.commit('setUser', response.data);
             
+            this.popup = false;
             this.$router.push('/player')
           })
         } else {
@@ -145,10 +143,7 @@ export default {
     getPlayer() {
       this.$api.get(`/players/${this.getCookie('uid')}`)
       .then((response) => {
-        store.commit('setUid', response.data.uid);
-        store.commit('setPseudo', response.data.name);
-        store.commit('setRessources', response.data.ressources);
-        store.commit('setScore', response.data.score);
+        store.commit('setUser', response.data);
       })
       .catch((error) => {
         console.log(error.response.data.detail.code)
@@ -170,6 +165,7 @@ export default {
     },
   },
   mounted() {
+    console.log(this.user);
     if(this.getCookie('uid') !== null) {
       this.getPlayer()
     }
@@ -192,28 +188,33 @@ export default {
   color: #ffffff;
 }
 
+body {
+  scrollbar-gutter: stable;
+}
+
 button:hover > svg {
   fill: #000000;
   transition: all 0.2s ease-in-out;
 }
 
-body {
-  background: rgba(12,11,11,1);
-  margin: 0;
-  z-index: -1;
-  animation: bg-animate 8s infinite;
+.button {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
-@keyframes bg-animate {
-  0% {
-    background: rgba(12,11,11,1);
+.button:hover {
+  transform: scale(1.05);
+  background-color: white;
+  color: black;
+  & svg {
+    fill: black;
   }
-  50% {
-    background: rgb(0, 0, 0);
-  }
-  100% {
-    background: rgba(12,11,11,1);
-  }
+}
+
+body {
+  background: rgb(7, 7, 7);
+  margin: 0;
+  z-index: -1;
 }
 
 body::after {
@@ -226,6 +227,8 @@ body::after {
   right: 0;
   bottom: 0;
   z-index: -1;
+  width: 100vw;
+  height: 100vh;
 }
 
 nav {
@@ -241,13 +244,51 @@ nav {
 }
 
 nav a {
-  font-weight: 500;
-  color: white;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  font-weight: 700;
+  color: rgb(165, 165, 165);
   text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+nav a:hover {
+  color: white;
+}
+
+nav a:hover > svg {
+  fill: rgb(255, 255, 255);
 }
 
 nav a.router-link-exact-active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border: 1px solid white;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0.5rem;
   font-weight: 700;
+}
+
+nav a.router-link-exact-active:hover {
+  background-color: white;
+  color: black;
+}
+
+nav a.router-link-exact-active:hover > svg {
+  fill: black;
+}
+
+nav a.router-link-exact-active > svg {
+  fill: rgb(255, 255, 255);
 }
 
 p {

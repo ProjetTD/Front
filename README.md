@@ -1,4 +1,4 @@
-# bdd_svd
+# bdd_sdv
 
 ## Project setup
 ```
