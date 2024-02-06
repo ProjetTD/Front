@@ -4,6 +4,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        theme: {
+          main: 'linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(59,59,59,1) 50%, rgba(19,19,19,1) 100%)',
+        },
         wedevus: {
           primary: '#6D1330',
           secondary: '#921330',

@@ -1,6 +1,8 @@
 const lang = {
     version: "1.0.0",
-    in_progress: "Partie en cours...",    
+    in_progress: "Partie en cours...",
+    not_started: "Partie non commencée...",
+    finished: "Partie terminée...",
   };
   
   export default {

@@ -144,7 +144,7 @@ export default {
           id_player: this.user.id_player,
           id_level: 1,
           score: 0,
-          status: 'in_progress',
+          status: 'not_started',
         }).then((response) => {
           this.setCookie('gid', response.data.id_game);
           store.commit('setGame', response.data);
