@@ -6,16 +6,16 @@
         <svg class="h-6 duration-200" fill="#a5a5a5" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-door-box">
           <path d="M13,14H11V12H13ZM16,18H17V17H18V5H17V4H5V5H4V17H5V18H6V6H16ZM18,20H4V19H3V18H2V4H3V3H4V2H18V3H19V4H20V18H19V19H18ZM14,18V8H8V18Z" />
         </svg>
-        <p>Accueil</p>
+        <p class="hidden lg:block">Accueil</p>
       </router-link>
-      <router-link v-if="user.uid" to="/player">
+      <router-link v-if="user.id_player" to="/player">
         <svg class="h-6 duration-200" fill="#a5a5a5" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-device">
           <path d="M2 1H20V2H20.94V20H20V21H2V20H1.06V2H2V1M3 3V19H19V3H3M4 4H18V12H4V4M5 14H8V17H5V14M12 15H14V17H12V15M15 14H17V16H15V14Z" />
         </svg>
-        <p>Jeux</p>
+        <p class="hidden lg:block">Jeux</p>
       </router-link>
     </div>
-    <div v-if="user.uid && user.name" class="flex items-center gap-[30px]">
+    <div v-if="user.id_player && user.name" class="flex items-center gap-[30px]">
       <div class="flex items-center justify-center gap-2 border-white border-[1px] rounded-xl px-3 py-2">
         <img title="Pseudo" class="h-6" src="@/assets/images/player/account.svg">
         <p title="Pseudo" class="font-normal">{{ user.name }}</p>
@@ -28,7 +28,7 @@
         <svg class="h-6" fill="#ffffff" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-arrow-left-circle">
           <path d="M12 16H10V15H9V14H8V13H7V12H6V10H7V9H8V8H9V7H10V6H12V8H11V9H10V10H16V12H10V13H11V14H12V16M15 21H7V20H5V19H4V18H3V17H2V15H1V7H2V5H3V4H4V3H5V2H7V1H15V2H17V3H18V4H19V5H20V7H21V15H20V17H19V18H18V19H17V20H15V21M16 17H17V16H18V14H19V8H18V6H17V5H16V4H14V3H8V4H6V5H5V6H4V8H3V14H4V16H5V17H6V18H8V19H14V18H16V17Z" />
         </svg>
-        Se déconnecter
+        <p class="hidden lg:block">Se déconnecter</p>
       </button>
     </div>
     <div v-else class="flex items-center gap-[30px]">
@@ -36,7 +36,7 @@
         <svg class="h-6" fill="#ffffff" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-arrow-right-circle">
           <path d="M7 1H15V2H17V3H18V4H19V5H20V7H21V15H20V17H19V18H18V19H17V20H15V21H7V20H5V19H4V18H3V17H2V15H1V7H2V5H3V4H4V3H5V2H7V1M6 5H5V6H4V8H3V14H4V16H5V17H6V18H8V19H14V18H16V17H17V16H18V14H19V8H18V6H17V5H16V4H14V3H8V4H6V5M10 6H12V7H13V8H14V9H15V10H16V12H15V13H14V14H13V15H12V16H10V14H11V13H12V12H6V10H12V9H11V8H10V6Z" />
         </svg>
-        Se connecter
+        <p class="hidden lg:block">Se connecter</p>
       </button>
     </div>
   </nav>
@@ -94,6 +94,9 @@ export default {
     user() {
       return store.state.user;
     },
+    game() {
+      return store.state.game;
+    }
   },
   methods: {
     createPlayer(pseudo) {
@@ -112,7 +115,7 @@ export default {
         ressources: 100,
       })
       .then((response) => {
-        this.setCookie('uid', response.data.uid);
+        this.setCookie('uid', response.data.id_player);
 
         store.commit('setUser', response.data);
 
@@ -122,7 +125,7 @@ export default {
         if(error.response.data.detail.code === 'PLAYER_ALREADY_EXISTS') {
           this.$api.get(`/players/name/${this.inputPseudo}`)
           .then((response) => {
-            this.setCookie('uid', response.data.uid);
+            this.setCookie('uid', response.data.id_player);
 
             store.commit('setUser', response.data);
             
@@ -136,18 +139,51 @@ export default {
     },
     removeSession() {
       store.commit('resetUser');
+      store.commit('resetGame');
       this.setCookie('uid', '', -1);
+      this.setCookie('gid', '', -1);
       this.$router.go();
       this.$router.push('/');
     },
-    getPlayer() {
-      this.$api.get(`/players/${this.getCookie('uid')}`)
-      .then((response) => {
-        store.commit('setUser', response.data);
-      })
-      .catch((error) => {
-        console.log(error.response.data.detail.code)
-      })
+    async getPlayer() {
+      if(this.getCookie('uid') === null) {
+        this.$router.push('/')
+      } else {
+        await this.$api.get(`/players/${this.getCookie('uid')}`)
+        .then((response) => {
+          store.commit('setUser', response.data);
+        })
+        .catch((error) => {
+          console.log(error.response.data.detail.code)
+        })
+      }
+    },
+    async getGame() {
+      if(this.getCookie('gid') === null) {
+        this.$router.push('/')
+      } else {
+        await this.$api.get(`/games/${this.getCookie('gid')}`)
+        .then((response) => {
+          store.commit('setGame', response.data);
+          this.getLevel();
+        })
+        .catch((error) => {
+          console.log(error.response.data)
+        })
+      }
+    },
+    async getLevel() {
+      if(this.game.id_level === null) {
+        this.$router.push('/')
+      } else {
+        await this.$api.get(`/levels/${this.game.id_level}`)
+        .then((response) => {
+          store.commit('setLevel', response.data);
+        })
+        .catch((error) => {
+          console.log(error.response.data)
+        })
+      }
     },
     setCookie(name, value) {
       document.cookie = `${name}=${value}; path=/`;
@@ -165,9 +201,11 @@ export default {
     },
   },
   mounted() {
-    console.log(this.user);
     if(this.getCookie('uid') !== null) {
       this.getPlayer()
+    }
+    if(this.getCookie('gid') !== null) {
+      this.getGame()
     }
   }
 }
