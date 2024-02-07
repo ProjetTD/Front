@@ -1,6 +1,9 @@
 <template>
   <div v-if="user.name !== undefined && user.name" class="h-screen w-full flex items-center justify-center flex-col gap-6 mt-2 mb-2">
     <div class="flex flex-col items-center justify-center h-full w-full gap-6"> <!--MAIN-->
+      <div v-if="game.status === 'not_started'" class="border-white border-[1px] bg-black/90 rounded-xl px-3 py-2" :class="{ 'animate-start-main': game.status === 'not_started' }">
+        <h1 class="text-2xl font-black uppercase">Achetez un robot dans la boutique puis placez-le pour commencer la partie</h1>
+      </div>
       <div class="flex flex-col lg:flex-row items-center justify-center gap-3 mt-10 lg:mt-0">
         <!-- Informations sur le joueur -->
         <div class="flex flex-row items-center justify-center gap-2 border-white border-[1px] bg-black/90 rounded-xl px-3 py-2">
@@ -33,27 +36,24 @@
           <h1 class="text-2xl font-bold uppercase">Boutique</h1>
         </div>
         <div class="flex flex-row items-center justify-center gap-2">
-          <button v-on:click="shop(robots[0].name, robots[0].power, robots[0].health)" class="flex flex-row items-center justify-center gap-2">
+          <button v-on:click="shop(robots[0].name, robots[0].power, robots[0].health)" class="p-2 flex flex-row items-center justify-center border-white/0 border-[1px] rounded-xl gap-2 duration-200" :class="{ 'border-white/100': selectedRobot.name === 'Normal', 'animate-start-sop': game.status === 'not_started' }">
             <img title="Coût" class="h-6" src="@/assets/images/player/ressources.svg">
             <p class="font-semibold opacity-80">-{{ robots[0].cost }}</p>
             <img title="Coût" class="h-6" src="@/assets/images/player/robot_Normal.png">
           </button>
           <p>|</p>
-          <button v-on:click="shop(robots[1].name, robots[1].power, robots[1].health)" class="flex flex-row items-center justify-center gap-2">
+          <button v-on:click="shop(robots[1].name, robots[1].power, robots[1].health)" class="p-2 flex flex-row items-center justify-center border-white/0 border-[1px] rounded-xl gap-2 duration-200" :class="{ 'border-white/100': selectedRobot.name === 'Gunner', 'animate-start-sop': game.status === 'not_started' }">
             <img title="Coût" class="h-6" src="@/assets/images/player/ressources.svg">
             <p class="font-semibold opacity-80">-{{ robots[1].cost }}</p>
             <img title="Coût" class="h-6" src="@/assets/images/player/robot_Gunner.png">
           </button>
           <p>|</p>
-          <button v-on:click="shop(robots[2].name, robots[2].power, robots[2].health)" class="flex flex-row items-center justify-center gap-2">
+          <button v-on:click="shop(robots[2].name, robots[2].power, robots[2].health)" class="p-2 flex flex-row items-center justify-center border-white/0 border-[1px] rounded-xl gap-2 duration-200" :class="{ 'border-white/100': selectedRobot.name === 'Bigbro', 'animate-start-sop': game.status === 'not_started' }">
             <img title="Coût" class="h-6" src="@/assets/images/player/ressources.svg">
             <p class="font-semibold opacity-80">-{{ robots[2].cost }}</p>
             <img title="Coût" class="h-6" src="@/assets/images/player/robot_Bigbro.png">
           </button>
         </div>
-      </div>
-      <div v-if="game.status === 'not_started'">
-        <h1 class="text-2xl font-black uppercase">Veuillez placer un robot pour commencer la partie</h1>
       </div>
       <div class="flex flex-row items-center justify-center">
         <div class="flex flex-col justify-center gap-2">
@@ -65,7 +65,7 @@
                   <div class="health-bar !animate-none" :style="{ width: getAlienHealthWidth(aliens[0]) }"></div>
                 </div>
               </div>
-              <div v-on:click="placeRobot(row)" v-if="col === robotsColumn" :class="'background-' + selectedRobot.name"></div>
+              <div v-on:click="placeRobot(row)" v-if="col === robotsColumn" class="border-[1px] border-white/0 rounded-xl" :class="'background-' + selectedRobot.name"></div>
               <div v-for="robot in placedRobot" :key="robot.column">
                 <div class="flex flex-col items-center justify-center" v-if="robot.row === row && robot.column === col">
                   <img :src="getRobotImage(robot.type)" class="w-16 h-16" :class="{ '-scale-x-[1]': robot.type === 'Gunner' }">
@@ -306,7 +306,7 @@ export default {
             })
             this.game.status = 'finished';
             this.$api.patch(`/players/${this.user.id_player}`, {
-              score: this.user.ressources + this.level.reward,
+              ressources: this.user.ressources + this.level.reward,
             })
             this.user.ressources += this.level.reward;
             clearInterval(interval);
@@ -322,10 +322,10 @@ export default {
         this.$api.patch(`/players/${this.user.id_player}`, {
           score: this.user.score + robot.power,
         })
-        this.user.score += robot.power;
         this.$api.patch(`/games/${this.getCookie('gid')}`, {
           score: this.user.score + robot.power,
         })
+        this.user.score += robot.power;
         this.game.score += robot.power;
         if (this.aliens[0].health <= 0) {
           this.user.ressources += this.aliens[0].drop;
@@ -367,7 +367,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 .health-bar {
   position: relative;
@@ -376,6 +376,39 @@ export default {
   background-color: green;
   z-index: 1;
   transition: all 0.5s;
+}
+
+.animate-start {
+  &-shop {
+    animation: start-shop 1s infinite cubic-bezier(0.55, 0.15, 0.45, 0.25);
+  }
+  &-main {
+    animation: start-main 1s infinite linear;
+  }
+}
+
+@keyframes start-shop {
+  0% {
+    border: 1px solid transparent;
+  }
+  50% {
+    border: 1px solid #ff9900;
+  }
+  100% {
+    border: 1px solid transparent;
+  }
+}
+
+@keyframes start-main {
+  0% {
+    color: #ffffff00;
+  }
+  50% {
+    color: #ffffff;
+  }
+  100% {
+    color: #ffffff00;
+  }
 }
 
 div {
@@ -393,53 +426,59 @@ div {
 
 .background-Normal {
   content: '';
-  background-image: url(@/assets/images/player/robot_Normal.png);
+  background-image: none;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   width: 4rem;
   height: 4rem;
-  opacity: 0;
+  border: 1px solid white;
+  border-radius: 0.75rem;
   position: absolute;
   z-index: 1;
+  transition: border 0.5s;
 }
 
 .background-Normal:hover {
-  opacity: 1;
+  background-image: url(@/assets/images/player/robot_Normal.png);
 }
 
 .background-Gunner {
   content: '';
   transform: scaleX(-1);
-  background-image: url(@/assets/images/player/robot_Gunner.png);
+  background-image: none;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   width: 4rem;
   height: 4rem;
-  opacity: 0;
+  border: 1px solid white;
+  border-radius: 0.75rem;
   position: absolute;
   z-index: 1;
+  transition: border 0.5s;
 }
 
 .background-Gunner:hover {
-  opacity: 1;
+  background-image: url(@/assets/images/player/robot_Gunner.png);
 }
 
 .background-Bigbro {
   content: '';
-  background-image: url(@/assets/images/player/robot_Bigbro.png);
+  background-image: none;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   width: 4rem;
   height: 4rem;
-  opacity: 0;
+  border: 1px solid white;
+  border-radius: 0.75rem;
   position: absolute;
   z-index: 1;
+  transition: border 0.5s;
 }
 
 .background-Bigbro:hover {
-  opacity: 1;
+  background-image: url(@/assets/images/player/robot_Bigbro.png);
 }
 </style>
