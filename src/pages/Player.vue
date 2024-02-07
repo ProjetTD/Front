@@ -1,8 +1,9 @@
 <template>
   <div v-if="user.name !== undefined && user.name" class="h-screen w-full flex items-center justify-center flex-col gap-6 mt-2 mb-2">
     <div class="flex flex-col items-center justify-center h-full w-full gap-6"> <!--MAIN-->
-      <div v-if="game.status === 'not_started'" class="border-white border-[1px] bg-black/90 rounded-xl px-3 py-2" :class="{ 'animate-start-main': game.status === 'not_started' }">
-        <h1 class="text-2xl font-black uppercase">Achetez un robot dans la boutique puis placez-le pour commencer la partie</h1>
+      <div class="border-white border-[1px] bg-black/90 rounded-xl px-3 py-2" :class="{ 'animate-start-main': game.status === 'not_started' }">
+        <h1 v-if="game.status === 'not_started'" class="text-2xl font-black uppercase">Achetez un robot dans la boutique puis placez-le pour commencer la partie</h1>
+        <h1 v-if="game.status === 'in_progress'" class="text-2xl font-black uppercase">Tuez les aliens afin qu'ils n'atteignent pas votre base !</h1>
       </div>
       <div class="flex flex-col lg:flex-row items-center justify-center gap-3 mt-10 lg:mt-0">
         <!-- Informations sur le joueur -->
@@ -383,7 +384,7 @@ export default {
     animation: start-shop 1s infinite cubic-bezier(0.55, 0.15, 0.45, 0.25);
   }
   &-main {
-    animation: start-main 1s infinite linear;
+    animation: start-main 3s infinite linear;
   }
 }
 
@@ -401,13 +402,13 @@ export default {
 
 @keyframes start-main {
   0% {
-    color: #ffffff00;
+    color: #ffffff70;
   }
   50% {
     color: #ffffff;
   }
   100% {
-    color: #ffffff00;
+    color: #ffffff70;
   }
 }
 
@@ -425,60 +426,106 @@ div {
 }
 
 .background-Normal {
-  content: '';
-  background-image: none;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  cursor: pointer;
+  display: flex;
   width: 4rem;
   height: 4rem;
-  border: 1px solid white;
   border-radius: 0.75rem;
   position: absolute;
   z-index: 1;
   transition: border 0.5s;
 }
 
+.background-Normal:after {
+  cursor: pointer;
+  content: '';
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  opacity: 0.2;
+  background-image: url(@/assets/images/player/robot_Normal.png);
+}
+
 .background-Normal:hover {
+  cursor: pointer;
+  content: '';
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   background-image: url(@/assets/images/player/robot_Normal.png);
 }
 
 .background-Gunner {
-  content: '';
-  transform: scaleX(-1);
-  background-image: none;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  cursor: pointer;
+  display: flex;
   width: 4rem;
   height: 4rem;
-  border: 1px solid white;
   border-radius: 0.75rem;
   position: absolute;
   z-index: 1;
   transition: border 0.5s;
 }
 
+.background-Gunner:after {
+  cursor: pointer;
+  content: '';
+  position: absolute;
+  transform: scaleX(-1);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  opacity: 0.2;
+  background-image: url(@/assets/images/player/robot_Gunner.png);
+}
+
 .background-Gunner:hover {
+  cursor: pointer;
+  content: '';
+  transform: scaleX(-1);
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   background-image: url(@/assets/images/player/robot_Gunner.png);
 }
 
 .background-Bigbro {
-  content: '';
-  background-image: none;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  cursor: pointer;
+  display: flex;
   width: 4rem;
   height: 4rem;
-  border: 1px solid white;
   border-radius: 0.75rem;
   position: absolute;
   z-index: 1;
   transition: border 0.5s;
 }
 
+.background-Bigbro:after {
+  cursor: pointer;
+  content: '';
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  opacity: 0.2;
+  background-image: url(@/assets/images/player/robot_Bigbro.png);
+}
+
 .background-Bigbro:hover {
+  cursor: pointer;
+  content: '';
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   background-image: url(@/assets/images/player/robot_Bigbro.png);
 }
 </style>
