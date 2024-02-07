@@ -59,15 +59,19 @@
         <div class="flex flex-col justify-center gap-2">
           <div v-for="row in 5" :key="row" class="bg-theme-main flex border-white border-[1px] rounded-xl">
             <div v-for="col in 10" :key="col" class="flex items-center justify-center w-20 h-20">
-              <div v-if="col === aliensColumn && row === aliensRow" class="w-16 h-16 flex items-center justify-center">
+              <div v-if="col === aliensColumn && row === aliensRow && game.status !== 'not_started'" class="w-16 h-16 flex flex-col items-center justify-center">
                 <img v-if="aliens.length > 0" :src="getAlienImage(aliens[0].name)" class="-scale-x-[1] w-16 h-16" />
-                {{ aliens.length > 0 ? aliens[0].health : '' }}
+                <div v-if="aliens.length > 0" class="!animate-none flex items-center w-full h-[5px] border-white border-[1px] rounded-xl">
+                  <div class="health-bar !animate-none" :style="{ width: getAlienHealthWidth(aliens[0]) }"></div>
+                </div>
               </div>
               <div v-on:click="placeRobot(row)" v-if="col === robotsColumn" :class="'background-' + selectedRobot.name"></div>
               <div v-for="robot in placedRobot" :key="robot.column">
-                <div class="flex items-center justify-center" v-if="robot.row === row && robot.column === col">
+                <div class="flex flex-col items-center justify-center" v-if="robot.row === row && robot.column === col">
                   <img :src="getRobotImage(robot.type)" class="w-16 h-16" :class="{ '-scale-x-[1]': robot.type === 'Gunner' }">
-                  {{ robot.health }}
+                  <div class="flex items-center w-full h-[5px] border-white border-[1px] rounded-xl">
+                    <div class="health-bar" :style="{ width: getHealthWidth(robot) }"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -93,6 +97,7 @@ export default {
   data() {
     return {
       aliens: [],
+      defaultAliens: [],
       robots: [],
       aliensColumn: 10,
       aliensRow: 1,
@@ -115,6 +120,39 @@ export default {
     }
   },
   methods: {
+    getAlienHealthWidth(alien) {
+      const maxHealth = this.getMaxHealthByAlienType(alien.name);
+      console.log(this.defaultAliens);
+      return (alien.health / maxHealth) * 100 + '%';
+    },
+    getMaxHealthByAlienType(alienType) {
+      switch (alienType) {
+        case 'Normal':
+          return this.defaultAliens[0].health;
+        case 'Runner':
+          return this.defaultAliens[1].health;
+        case 'Tank':
+          return this.defaultAliens[2].health;
+        default:
+          return 100;
+      }
+    },
+    getHealthWidth(robot) {
+      const maxHealth = this.getMaxHealthByType(robot.type);
+      return (robot.health / maxHealth) * 100 + '%';
+    },
+    getMaxHealthByType(robotType) {
+      switch (robotType) {
+        case 'Normal':
+          return this.robots[0].health;
+        case 'Gunner':
+          return this.robots[1].health;
+        case 'Bigbro':
+          return this.robots[2].health;
+        default:
+          return 100;
+      }
+    },
     shop(robotType, power, health) {
       this.selectedRobot = { 
         name: robotType,
@@ -219,6 +257,7 @@ export default {
         this.game.status = 'in_progress';
 
         const response = await this.$api.get('/aliens');
+        this.defaultAliens = response.data;
         const alienTypes = response.data;
         for (const alienType of alienTypes) {
           const aliensToSpawn = alienType.probability * this.level.number_of_alien / 100;
@@ -240,9 +279,11 @@ export default {
               this.placedRobot.forEach(robot => {
                 if (robot.row === this.aliensRow) {
                   robot.health -= this.aliens[0].power;
-                  if (robot.health <= 0) {
-                    this.placedRobot.splice(this.placedRobot.indexOf(robot), 1);
-                  }
+                  setTimeout(() => {
+                    if (robot.health <= 0) {
+                      this.placedRobot.splice(this.placedRobot.indexOf(robot), 1);
+                    }
+                  }, 500);
                 }
               });
               if (this.user.ressources !== this.previousRessources) {
@@ -270,13 +311,13 @@ export default {
             this.user.ressources += this.level.reward;
             clearInterval(interval);
           }
-        }, 100);
+        }, 500);
       } catch (error) {
         console.error('Erreur lors de la récupération des aliens:', error);
       }
     },
     shootAlien(robot) {
-      if (this.aliensRow === robot.row) {
+      if (this.aliensRow === robot.row && this.aliens.length > 0) {
         this.aliens[0].health -= robot.power;
         this.$api.patch(`/players/${this.user.id_player}`, {
           score: this.user.score + robot.power,
@@ -294,17 +335,31 @@ export default {
           this.level.number_of_alien = this.aliens.length;
         }
       }
-    }
+    },
+    async getLevel() {
+      if(this.game.id_level === null) {
+        this.$router.push('/')
+      } else {
+        await this.$api.get(`/levels/${this.game.id_level}`)
+        .then((response) => {
+          store.commit('setLevel', response.data);
+        })
+        .catch((error) => {
+          console.log(error.response.data)
+        })
+      }
+    },
   },
   mounted() {
     if(!this.getCookie('uid')) {
       this.$router.push('/');
     }
-    if(this.level && this.game) {
+    if(this.game) {
       this.$api.patch(`/games/${this.getCookie('gid')}`, {
         status: 'not_started',
       })
       this.game.status = 'not_started';
+      this.getLevel();
       this.getRobots();
       this.spawnAliens();
     }
@@ -313,6 +368,15 @@ export default {
 </script>
 
 <style scoped>
+
+.health-bar {
+  position: relative;
+  width: 100%;
+  height: 3px;
+  background-color: green;
+  z-index: 1;
+  transition: all 0.5s;
+}
 
 div {
   animation: fade 1s;
