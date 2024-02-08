@@ -66,7 +66,7 @@
                   <div class="health-bar !animate-none" :style="{ width: getAlienHealthWidth(aliens[0]) }"></div>
                 </div>
               </div>
-              <div v-on:click="placeRobot(row)" v-if="col === robotsColumn" class="border-[1px] border-white/0 rounded-xl" :class="'background-' + selectedRobot.name"></div>
+              <div v-on:click="placeRobot(row)" v-if="col === robotsColumn && !this.placedRobot.some(robot => robot.row === row && robot.column === this.robotsColumn)" class="border-[1px] border-white/0 rounded-xl" :class="'background-' + selectedRobot.name"></div>
               <div v-for="robot in placedRobot" :key="robot.column">
                 <div class="flex flex-col items-center justify-center" v-if="robot.row === row && robot.column === col">
                   <img :src="getRobotImage(robot.type)" class="w-16 h-16" :class="{ '-scale-x-[1]': robot.type === 'Gunner' }">
@@ -464,6 +464,7 @@ div {
   display: flex;
   width: 4rem;
   height: 4rem;
+  transform: scaleX(-1);
   border-radius: 0.75rem;
   position: absolute;
   z-index: 1;
@@ -474,7 +475,6 @@ div {
   cursor: pointer;
   content: '';
   position: absolute;
-  transform: scaleX(-1);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -487,7 +487,6 @@ div {
 .background-Gunner:hover {
   cursor: pointer;
   content: '';
-  transform: scaleX(-1);
   position: absolute;
   background-size: cover;
   background-position: center;
