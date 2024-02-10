@@ -434,29 +434,27 @@ div {
   position: absolute;
   z-index: 1;
   transition: border 0.5s;
-}
-
-.background-Normal:after {
-  cursor: pointer;
-  content: '';
-  position: absolute;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 100%;
-  height: 100%;
-  opacity: 0.2;
-  background-image: url(@/assets/images/player/robot_Normal.png);
-}
-
-.background-Normal:hover {
-  cursor: pointer;
-  content: '';
-  position: absolute;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url(@/assets/images/player/robot_Normal.png);
+  &:after {
+    cursor: pointer;
+    content: '';
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+    background-image: url(@/assets/images/player/robot_Normal.png);
+  }
+  &:hover {
+    cursor: pointer;
+    content: '';
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(@/assets/images/player/robot_Normal.png);
+  }
 }
 
 .background-Gunner {
@@ -469,29 +467,27 @@ div {
   position: absolute;
   z-index: 1;
   transition: border 0.5s;
-}
-
-.background-Gunner:after {
-  cursor: pointer;
-  content: '';
-  position: absolute;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 100%;
-  height: 100%;
-  opacity: 0.2;
-  background-image: url(@/assets/images/player/robot_Gunner.png);
-}
-
-.background-Gunner:hover {
-  cursor: pointer;
-  content: '';
-  position: absolute;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url(@/assets/images/player/robot_Gunner.png);
+  &:after {
+    cursor: pointer;
+    content: '';
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+    background-image: url(@/assets/images/player/robot_Gunner.png);
+  }
+  &:hover {
+    cursor: pointer;
+    content: '';
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(@/assets/images/player/robot_Gunner.png);
+  }
 }
 
 .background-Bigbro {
@@ -503,28 +499,26 @@ div {
   position: absolute;
   z-index: 1;
   transition: border 0.5s;
-}
-
-.background-Bigbro:after {
-  cursor: pointer;
-  content: '';
-  position: absolute;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 100%;
-  height: 100%;
-  opacity: 0.2;
-  background-image: url(@/assets/images/player/robot_Bigbro.png);
-}
-
-.background-Bigbro:hover {
-  cursor: pointer;
-  content: '';
-  position: absolute;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url(@/assets/images/player/robot_Bigbro.png);
+  &:after {
+    cursor: pointer;
+    content: '';
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+    background-image: url(@/assets/images/player/robot_Bigbro.png);
+  }
+  &:hover {
+    cursor: pointer;
+    content: '';
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(@/assets/images/player/robot_Bigbro.png);
+  }
 }
 </style>
