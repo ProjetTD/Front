@@ -4,6 +4,7 @@
       <div class="border-white border-[1px] bg-black/90 rounded-xl px-3 py-2" :class="{ 'animate-start-main': game.status === 'not_started' }">
         <h1 v-if="game.status === 'not_started'" class="text-2xl font-black uppercase">Achetez un robot dans la boutique puis placez-le pour commencer la partie</h1>
         <h1 v-if="game.status === 'in_progress'" class="text-2xl font-black uppercase">Tuez les aliens afin qu'ils n'atteignent pas votre base !</h1>
+        <h1 v-if="game.status === 'finished'" class="text-2xl font-black uppercase">La partie est terminée !</h1>
       </div>
       <div class="flex flex-col lg:flex-row items-center justify-center gap-3 mt-10 lg:mt-0">
         <!-- Informations sur le joueur -->
