@@ -63,15 +63,16 @@
             <div v-for="col in 10" :key="col" class="flex items-center justify-center w-20 h-20">
               <div v-if="col === aliensColumn && row === aliensRow && game.status !== 'not_started'" class="w-16 h-16 flex flex-col items-center justify-center">
                 <img v-if="aliens.length > 0" :src="getAlienImage(aliens[0].name)" class="-scale-x-[1] w-16 h-16" />
-                <div v-if="aliens.length > 0" class="!animate-none flex items-center w-full h-[5px] border-white border-[1px] rounded-xl">
+                <div v-if="aliens.length > 0" class="!animate-none flex items-center w-full h-[5px] border-white/30 border-[1px] rounded-3xl">
                   <div class="health-bar !animate-none" :style="{ width: getAlienHealthWidth(aliens[0]) }"></div>
                 </div>
               </div>
-              <div v-on:click="placeRobot(row)" v-if="col === robotsColumn && !this.placedRobot.some(robot => robot.row === row && robot.column === this.robotsColumn)" class="border-[1px] border-white/0 rounded-xl" :class="'background-' + selectedRobot.name"></div>
+              <!-- REGLER QU'ON NE PUISSE PAS METTRE DE ROBOT EN CAS D'ALIENS SUR LA ROW / COLUMN -->
+              <div v-on:click="placeRobot(row, col)" v-if="game.status !== 'finished' && col <= robotsColumn && row === aliensRow && col !== aliensColumn  && !this.placedRobot.some(robot => robot.row === row && robot.column === col)" class="border-[1px] border-white/0 rounded-xl" :class="'background-' + selectedRobot.name"></div>
               <div v-for="robot in placedRobot" :key="robot.column">
-                <div class="flex flex-col items-center justify-center" v-if="robot.row === row && robot.column === col">
+                <div class="flex flex-col items-center justify-center" v-if="game.status !== 'finished' && robot.row === row && robot.column === col">
                   <img :src="getRobotImage(robot.type)" class="w-16 h-16" :class="{ '-scale-x-[1]': robot.type === 'Gunner' }">
-                  <div class="flex items-center w-full h-[5px] border-white border-[1px] rounded-xl">
+                  <div class="flex items-center w-full h-[5px] border-white/30 border-[1px] rounded-3xl">
                     <div class="health-bar" :style="{ width: getHealthWidth(robot) }"></div>
                   </div>
                 </div>
@@ -84,7 +85,7 @@
   </div>
 </template>
 
-<script>
+<script lang="js">
 import store from '@/store';
 import NormalAlien from '@/assets/images/player/alien_Normal.png';
 import RunnerAlien from '@/assets/images/player/alien_Runner.png';
@@ -103,7 +104,7 @@ export default {
       robots: [],
       aliensColumn: 10,
       aliensRow: 1,
-      robotsColumn: 1,
+      robotsColumn: 4,
       selectedRobot: {},
       selectedRobotCost: 0,
       placedRobot: [],
@@ -175,21 +176,23 @@ export default {
           this.selectedRobotCost = 0;
       }
     },
-    placeRobot(row) {
-      const alreadyOccupied = this.placedRobot.some(robot => robot.row === row && robot.column === this.robotsColumn);
+    placeRobot(row, column) {
+      const alreadyOccupied = this.placedRobot.some(robot => robot.row === row && robot.column === column);
       if (!alreadyOccupied) {
         if (this.user.ressources >= this.selectedRobotCost) {
-          this.user.ressources -= this.selectedRobotCost;
-          this.$api.patch(`/players/${this.user.id_player}`, {
-            ressources: this.user.ressources,
-          });
-          this.placedRobot.push({
-            type: this.selectedRobot.name,
-            power: this.selectedRobot.power,
-            health: this.selectedRobot.health,
-            row: row,
-            column: this.robotsColumn,
-          });
+          if (this.robotsColumn >= 1 && this.robotsColumn <= 4) {
+            this.user.ressources -= this.selectedRobotCost;
+            this.$api.patch(`/players/${this.user.id_player}`, {
+              ressources: this.user.ressources,
+            });
+            this.placedRobot.push({
+              type: this.selectedRobot.name,
+              power: this.selectedRobot.power,
+              health: this.selectedRobot.health,
+              row: row,
+              column: column,
+            });
+          }
           this.selectedRobot = {};
         } else {
           alert('Vous n\'avez pas assez de ressources pour acheter ce robot !');
@@ -276,34 +279,43 @@ export default {
         }
         const interval = setInterval(() => {
           if (this.aliens.length > 0) {
-            this.aliensColumn -= 1;
-            if (this.aliensColumn <= 1) {
-              this.placedRobot.forEach(robot => {
-                if (robot.row === this.aliensRow) {
-                  robot.health -= this.aliens[0].power;
-                  setTimeout(() => {
-                    if (robot.health <= 0) {
-                      this.placedRobot.splice(this.placedRobot.indexOf(robot), 1);
-                    }
-                  }, 500);
-                }
-              });
-              if (this.user.ressources !== this.previousRessources) {
-                this.previousRessources = this.user.ressources;
-              }
-              this.aliensRow = this.getRandomRow();
+            const robotOnSameRow = this.placedRobot.find(robot => robot.row === this.aliensRow && robot.column <= this.robotsColumn);
+            const robotOnSameColumn = this.placedRobot.find(robot => robot.row === this.aliensRow && robot.column + 1 === this.aliensColumn);
+            if (!robotOnSameRow && !robotOnSameColumn && this.aliensColumn <= 1) {
               this.aliensColumn = 10;
             }
-            if (this.aliensColumn <= 10) {
+            if (!robotOnSameRow || this.aliensColumn > 2 && !robotOnSameColumn) {
+              this.aliensColumn -= 1;
+            }
+            this.placedRobot.forEach(robot => { // SI L'ALIEN EST SUR LA MEME LIGNE ET COLONNE +1 QUE LE ROBOT, LE ROBOT PERD DE LA VIE
+              if (robot.row === this.aliensRow && robot.column + 1 === this.aliensColumn) {
+                robot.health -= this.aliens[0].power;
+                setTimeout(() => {
+                  if (robot.health <= 0) {
+                    this.placedRobot.splice(this.placedRobot.indexOf(robot), 1); // SI LE ROBOT EST MORT, ON LE SUPPRIME
+                  }
+                }, 500);
+              }
+            });
+            if (this.user.ressources !== this.previousRessources) { // SYSTEME POUR METTRE EN ROUGE OU VERT LE NOMBRE DE RESSOURCES QUAND ON EN GAGNE OU PERD
+              this.previousRessources = this.user.ressources;
+            }
+            if (this.aliensColumn <= 10) { // SI L'ALIEN EST SUR LA LIGNE DU ROBOT, LE ROBOT TIRE SUR L'ALIEN
               this.placedRobot.forEach(robot => {
                 if (robot.row === this.aliensRow) {
                   this.shootAlien(robot);
                 }
               });
             }
+            if(this.aliensColumn <= 1) { // SI L'ALIEN EST SUR LA COLONNE 1 LA PARTIE EST PERDUE
+              this.$api.patch(`/games/${this.getCookie('gid')}`, {
+                status: 'finished',
+              })
+              this.game.status = 'finished';
+              clearInterval(interval);
+            }
           } else {
-            alert('La partie est terminée ! Vous avez gagné !');
-            this.$api.patch(`/games/${this.getCookie('gid')}`, {
+            this.$api.patch(`/games/${this.getCookie('gid')}`, { // SI TOUS LES ALIENS SONT MORTS LA PARTIE EST GAGNÉE
               status: 'finished',
             })
             this.game.status = 'finished';
@@ -318,8 +330,9 @@ export default {
         console.error('Erreur lors de la récupération des aliens:', error);
       }
     },
-    shootAlien(robot) {
+    async shootAlien(robot) {
       if (this.aliensRow === robot.row && this.aliens.length > 0) {
+        // L'alien attaque le robot s'ils sont adjacents
         this.aliens[0].health -= robot.power;
         this.$api.patch(`/players/${this.user.id_player}`, {
           score: this.user.score + robot.power,
@@ -375,7 +388,8 @@ export default {
   position: relative;
   width: 100%;
   height: 3px;
-  background-color: green;
+  background-color: rgb(0, 192, 0);
+  border-radius: 1.5rem;
   z-index: 1;
   transition: all 0.5s;
 }
