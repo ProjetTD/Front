@@ -32,7 +32,7 @@
       </button>
     </div>
     <div v-else class="flex items-center gap-[30px]">
-      <button v-on:click="popup = true" class="font-normal flex items-center justify-center gap-2 border-white border-[1px] rounded-xl px-2 py-2 hover:text-black hover:bg-white duration-200">
+      <button v-on:click="popup.show = !popup.show" class="font-normal flex items-center justify-center gap-2 border-white border-[1px] rounded-xl px-2 py-2 hover:text-black hover:bg-white duration-200">
         <svg class="h-6" fill="#ffffff" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-arrow-right-circle">
           <path d="M7 1H15V2H17V3H18V4H19V5H20V7H21V15H20V17H19V18H18V19H17V20H15V21H7V20H5V19H4V18H3V17H2V15H1V7H2V5H3V4H4V3H5V2H7V1M6 5H5V6H4V8H3V14H4V16H5V17H6V18H8V19H14V18H16V17H17V16H18V14H19V8H18V6H17V5H16V4H14V3H8V4H6V5M10 6H12V7H13V8H14V9H15V10H16V12H15V13H14V14H13V15H12V16H10V14H11V13H12V12H6V10H12V9H11V8H10V6Z" />
         </svg>
@@ -40,41 +40,6 @@
       </button>
     </div>
   </nav>
-  <transition name="fadeTransition">
-    <div v-show="popup"
-          class="z-[99] justify-center h-full gap-8 flex-col absolute lg:fixed w-full bg-black/95 text-white top-0 left-0 flex items-center text-center">
-      <div class="w-4/5 lg:w-2/5 flex flex-col items-center justify-center border-[1px] border-white/30 rounded-lg p-8 bg-black/70 gap-10">
-        <div class="relative w-full flex items-center justify-center gap-4">
-          <img class="mt-12 w-10 h-10" src="@/assets/images/player/more.svg" />
-          <h1 class="mt-12 font-black text-[1rem] lg:text-[1.5rem] z-10 uppercase">Création de la partie</h1>
-          <button
-            class="absolute top-0 left-0 w-8 rounded-md border border-gray-500 h-8 bg-black/70 hover:border-white duration-200"
-            v-on:click="popup = false">
-            <img src="@/assets/images/player/cross.svg" />
-          </button>
-        </div>
-        <div class="flex items-center flex-col w-full gap-7">
-          <span>
-            <p class="font-medium">Avant de commencer une partie, merci de renseigner votre pseudonyme.</p>
-            <br>
-            <br>
-            <i class="opacity-60">(Si vous vous déconnectez vous pouvez rentrer le pseudo que vous avez utilisé la dernière fois que vous avez joué, sinon veuillez créer un compte)</i>
-          </span>
-          <div class="input-container !w-full flex flex-col gap-4">
-            <p class="uppercase font-bold">Créer un compte / Se connecter</p>
-            <div class="content !rounded-lg">
-              <img class="opacity-70 h-14" src="@/assets/images/player/account.svg">
-              <input class="!w-full" id="title"
-                placeholder="Ecrivez votre pseudo..." type="text" v-model="inputPseudo" />
-            </div>
-          </div>
-          <div class="w-full flex flex-col gap-4 justify-center items-center">
-            <button class="button w-[230px] h-[50px] font-bold uppercase border-white border-[1px] rounded-md" v-on:click="createPlayer(inputPseudo)">Commencer</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </transition>
   <router-view/>
 </template>
 
@@ -86,7 +51,6 @@ export default {
   name: 'App',
   data() {
     return {
-      popup: false,
       inputPseudo: '',
     }
   },
@@ -96,6 +60,9 @@ export default {
     },
     game() {
       return store.state.game;
+    },
+    popup() {
+      return store.state.popup;
     }
   },
   methods: {
@@ -246,6 +213,12 @@ button:hover > svg {
   color: black;
   & svg {
     fill: black;
+  }
+}
+
+.button-revert:hover {
+  & svg {
+    fill: white;
   }
 }
 

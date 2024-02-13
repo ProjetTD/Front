@@ -5,6 +5,9 @@ export default createStore({
     user: {},
     game: {},
     level: {},
+    popup: {
+      show: false,
+    },
   },
   mutations: {
     setUser(state, data) {

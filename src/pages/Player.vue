@@ -58,20 +58,19 @@
             </button>
           </div>
         </div>
-        <div v-if="aliens.length > 0 && aliens[0].row" class="flex flex-row items-center justify-center gap-2">
+        <div v-if="aliens.length > 0 || game.status === 'finished'" class="flex flex-row items-center justify-center gap-2">
           <div class="flex flex-col justify-center gap-2">
             <div v-for="row in 5" :key="row" class="bg-theme-main flex border-white border-[1px] rounded-xl">
               <div v-for="col in 10" :key="col" class="flex items-center justify-center w-20 h-20">
-                <div v-if="col === aliensColumn && row === aliens[0].row && game.status !== 'not_started'" class="w-16 h-16 flex flex-col items-center justify-center">
+                <div v-if="aliens.length > 0 && col === aliensColumn && row === aliens[0].row && game.status !== 'not_started'" class="w-16 h-16 flex flex-col items-center justify-center">
                   <img v-if="aliens.length > 0" :src="getAlienImage(aliens[0].name)" class="-scale-x-[1] w-16 h-16" :class="{ 'filterRedAlien' : filterRedAlien}"/>
                   <div v-if="aliens.length > 0" class="!animate-none flex items-center w-full h-[5px] border-white/30 border-[1px] rounded-3xl">
                     <div class="health-bar !animate-none" :style="{ width: getAlienHealthWidth(aliens[0]) }"></div>
                   </div>
                 </div>
-                <!-- REGLER QU'ON NE PUISSE PAS METTRE DE ROBOT EN CAS D'ALIENS SUR LA ROW / COLUMN -->
-                <div v-on:click="placeRobot(row, col)" v-if="game.status !== 'finished' && col <= robotsColumn && (row !== aliens[0].row || col !== aliensColumn) && !this.placedRobot.some(robot => robot.row === row && robot.column === col)" class="border-[1px] border-white/0 rounded-xl" :class="'background-' + selectedRobot.name"></div>
+                <div v-on:click="placeRobot(row, col)" v-if="aliens.length > 0 && game.status !== 'finished' && col <= robotsColumn && (row !== aliens[0].row || col !== aliensColumn) && !this.placedRobot.some(robot => robot.row === row && robot.column === col)" class="border-[1px] border-white/0 rounded-xl" :class="'background-' + selectedRobot.name"></div>
                 <div v-for="robot in placedRobot" :key="robot.column">
-                  <div class="flex flex-col items-center justify-center" v-if="game.status !== 'finished' && robot.row === row && robot.column === col">
+                  <div class="flex flex-col items-center justify-center" v-if="aliens.length > 0 && game.status !== 'finished' && robot.row === row && robot.column === col">
                     <img :src="getRobotImage(robot.type)" class="w-16 h-16" :class="{ '-scale-x-[1]': robot.type === 'Gunner', 'filterRedRobot' : robot.isHit }">
                     <div class="flex items-center w-full h-[5px] border-white/30 border-[1px] rounded-3xl">
                       <div class="health-bar" :style="{ width: getHealthWidth(robot) }"></div>
@@ -81,22 +80,62 @@
               </div>
             </div>
           </div>
-          <div v-if="aliens.length > 0" class="flex items-center justify-center flex-col gap-2">
+          <div v-if="aliens.length > 0 || game.status === 'finished'" class="flex items-center justify-center flex-col gap-2">
             <div v-for="row in 5" :key="row" class="bg-theme-main flex border-white border-[1px] rounded-xl">
               <div v-for="col in 1" :key="col" class="flex items-center justify-center w-20 h-20">
-                <div v-if="col === 1 && row === aliens[0].row && placedRobot.length <= 0" class="w-16 h-16 flex flex-col items-center justify-center">
+                <div v-if="aliens.length > 0 && col === 1 && row === aliens[0].row && placedRobot.length <= 0" class="w-16 h-16 flex flex-col items-center justify-center">
                   <img v-if="aliens.length > 0" :src="getAlienImage(aliens[0].name)" class="-scale-x-[1] w-16 h-16" />
                 </div>
-                <div v-if="col === 1 && row === aliens[1].row && placedRobot.length > 0" class="w-16 h-16 flex flex-col items-center justify-center">
+                <div v-if="aliens.length > 1 && col === 1 && row === aliens[1].row && placedRobot.length > 0" class="w-16 h-16 flex flex-col items-center justify-center">
                   <img v-if="aliens.length > 0" :src="getAlienImage(aliens[1].name)" class="animate-alien -scale-x-[1] opacity-30 w-16 h-16" />
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <div v-else-if="aliens.length <= 0 && game.status !== 'finished'" class="flex items-center justify-center w-full h-1/3 flex-col gap-4">
+          <i>Une erreur est survenue lors de la récupération des aliens...</i>
+          <button v-on:click="reloadPage" class="button-revert font-normal flex items-center justify-center gap-2 hover:border-white border-[1px] rounded-xl px-2 py-2 text-black hover:text-white bg-white hover:bg-black/0 duration-200">
+            <svg class="h-6" fill="#000000" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-rotate-counterclockwise">
+              <path d="M0 11V12H1V13H2V14H3V15H5V14H6V13H7V12H8V11H5V9H6V7H7V6H9V5H13V6H15V7H16V9H17V13H16V15H15V16H13V17H9V16H6V18H8V19H14V18H16V17H17V16H18V14H19V8H18V6H17V5H16V4H14V3H8V4H6V5H5V6H4V8H3V11H0Z" />
+            </svg>
+            <p class="hidden lg:block">Recharger les données</p>
+          </button>
+        </div>
       </div>
     </div>
   </div>
+  <transition name="fadeTransition">
+    <div v-show="gameResult === 'lose' || gameResult === 'win'"
+          class="z-[99] justify-center h-full gap-8 flex-col absolute lg:fixed w-full bg-black/90 text-white top-0 left-0 flex items-center text-center">
+      <div class="w-4/5 lg:w-2/5 flex flex-col items-center justify-center border-[1px] border-white/30 rounded-lg p-8 bg-black/70 gap-10">
+        <div class="relative w-full flex items-center justify-center gap-4">
+          <img class="mt-12 w-10 h-10" src="@/assets/images/player/game_finished.svg" />
+          <h1 class="mt-12 font-black text-[1rem] lg:text-[1.5rem] z-10 uppercase">La partie est terminée !</h1>
+          <button
+            class="absolute top-0 left-0 w-8 rounded-md border border-gray-500 h-8 bg-black/70 hover:border-white duration-200"
+            v-on:click="reloadPage">
+            <img src="@/assets/images/player/cross.svg" />
+          </button>
+        </div>
+        <div class="flex items-center flex-col w-full gap-7">
+          <span>
+            <i v-if="gameResult === 'win'" class="opacity-80">Vous avez réussi à vaincre tous les aliens ! Grâce à ça, vous avez gagné <b>{{ level.reward }}</b> ressources.</i>
+            <i v-else-if="gameResult === 'lose'" class="opacity-80">Vous avez perdu la partie, les aliens ont réussi à atteindre votre base. Essayez de nouveau pour gagner des ressources !</i>
+            <div class="relative w-full flex items-center justify-center gap-2">
+              <img class="mt-12 w-7 h-7" src="@/assets/images/player/stats.svg" />
+              <h1 class="mt-12 font-black text-[0.6rem] lg:text-[1.2rem] z-10 uppercase">Statistiques globales</h1>
+            </div>
+            <br>
+            <p class="font-medium opacity-60">Votre score est de <b>{{ user.score }}</b> points.</p>
+            <p class="font-medium opacity-60">Vous avez gagné <b>{{ user.win }}</b> {{ user.win > 1 ? 'parties' : 'partie' }}.</p>
+            <p class="font-medium opacity-60">Vous avez perdu <b>{{ user.lose }}</b> {{ user.lose > 1 ? 'parties' : 'partie' }}.</p>
+            <p class="font-medium opacity-60">Vous avez <b>{{ user.ressources }}</b> {{ user.ressources > 1 ? 'ressources' : 'ressource' }}.</p>
+          </span>
+        </div>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script lang="js">
@@ -118,12 +157,13 @@ export default {
       robots: [],
       aliensColumn: 10,
       aliensRow: 1,
-      robotsColumn: 4,
+      robotsColumn: 3,
       selectedRobot: {},
       selectedRobotCost: 0,
       placedRobot: [],
       previousRessources: 0,
       filterRedAlien: false,
+      gameResult: null,
     }
   },
   computed: {
@@ -138,6 +178,18 @@ export default {
     }
   },
   methods: {
+    async reloadPage() {
+      window.location.reload();
+      this.game.status = 'not_started';
+      this.gameResult = null;
+      if(this.game) {
+        await this.$api.patch(`/games/${this.getCookie('gid')}`, {
+          status: 'not_started',
+        })
+      }
+      await this.getAliens();
+      await this.getRobots();
+    },
     getAlienHealthWidth(alien) {
       const maxHealth = this.getMaxHealthByAlienType(alien.name);
       return (alien.health / maxHealth) * 100 + '%';
@@ -278,7 +330,7 @@ export default {
           }
         }
         for (const element of this.aliens) {
-          element.row = Math.floor(Math.random() * 5) + 1;
+          element.row = Math.floor(Math.random() * 5) + 1; // AJOUTE UNE LIGNE ALEATOIRE A CHAQUE ALIEN
         }
         for (let i = 10; i < this.aliens.length; i++) { // RANDOMIZE LES ALIENS SAUF LES 10 PREMIERS CE SONT DES ALIENS NORMAUX
           const randomIndex = Math.floor(Math.random() * (this.aliens.length - 10)) + 10;
@@ -286,7 +338,6 @@ export default {
           this.aliens[i] = this.aliens[randomIndex];
           this.aliens[randomIndex] = temp;
         }
-        console.log(this.aliens);
       } catch (error) {
         console.error('Erreur lors de la récupération des aliens:', error);
       }
@@ -306,58 +357,75 @@ export default {
       let speed = this.aliens[0].speed*500;
 
       const intervalAlienSpeed = setInterval(() => {
-        const robotOnSameRow = this.placedRobot.find(robot => robot.row === this.aliens[0].row && robot.row <= this.robotsColumn + 1);
-        const robotOnSameColumn = this.placedRobot.find(robot => robot.row === this.aliens[0].row && robot.column + 1 === this.aliensColumn);
-        if (!robotOnSameRow || this.aliensColumn > 1 && !robotOnSameColumn) {
-          this.aliensColumn--;
-        }
-        this.placedRobot.forEach(robot => { // SI L'ALIEN EST SUR LA MEME LIGNE ET COLONNE +1 QUE LE ROBOT, LE ROBOT PERD DE LA VIE
-          // if (!robotOnSameRow && !robotOnSameColumn && this.aliensColumn <= 1) {
-          //   this.aliensColumn = 10;
-          // }
-          if (robot.row === this.aliens[0].row && robot.column + 1 === this.aliensColumn) {
-            robot.isHit = true;
-            robot.health -= this.aliens[0].power;
-            setTimeout(() => {
-              robot.isHit = false;
-            }, 100);
-            setTimeout(() => {
-              if (robot.health <= 0 && this.placedRobot.indexOf(robot) !== -1) {
-                this.placedRobot.splice(this.placedRobot.indexOf(robot), 1); // SI LE ROBOT EST MORT, ON LE SUPPRIME
-              }
-            }, speed);
-          }
-        });
         if (this.aliens.length > 0) {
-          if (this.user.ressources !== this.previousRessources) { // SYSTEME POUR METTRE EN ROUGE OU VERT LE NOMBRE DE RESSOURCES QUAND ON EN GAGNE OU PERD
-            this.previousRessources = this.user.ressources;
+          const robotOnSameRow = this.placedRobot.find(robot => robot.row === this.aliens[0].row && robot.row <= this.robotsColumn + 1);
+          const robotOnSameColumn = this.placedRobot.find(robot => robot.row === this.aliens[0].row && robot.column + 1 === this.aliensColumn);
+          if (!robotOnSameRow || this.aliensColumn > 1 && !robotOnSameColumn) {
+            this.aliensColumn--;
           }
-          if(this.aliensColumn <= 1) { // SI L'ALIEN EST SUR LA COLONNE 1 LA PARTIE EST PERDUE
-            this.$api.patch(`/games/${this.getCookie('gid')}`, {
+          this.placedRobot.forEach(robot => { // SI L'ALIEN EST SUR LA MEME LIGNE ET COLONNE +1 QUE LE ROBOT, LE ROBOT PERD DE LA VIE
+            // if (!robotOnSameRow && !robotOnSameColumn && this.aliensColumn <= 1) {
+            //   this.aliensColumn = 10;
+            // }
+            if (robot.row === this.aliens[0].row && robot.column + 1 === this.aliensColumn) {
+              robot.isHit = true;
+              robot.health -= this.aliens[0].power;
+              setTimeout(() => {
+                robot.isHit = false;
+              }, 100);
+              setTimeout(() => {
+                if (robot.health <= 0 && this.placedRobot.indexOf(robot) !== -1) {
+                  this.placedRobot.splice(this.placedRobot.indexOf(robot), 1); // SI LE ROBOT EST MORT, ON LE SUPPRIME
+                }
+              }, speed);
+            }
+          });
+          if (this.aliens.length > 0) {
+            if (this.user.ressources !== this.previousRessources) { // SYSTEME POUR METTRE EN ROUGE OU VERT LE NOMBRE DE RESSOURCES QUAND ON EN GAGNE OU PERD
+              this.previousRessources = this.user.ressources;
+            }
+            if(this.aliensColumn <= 1) { // SI L'ALIEN EST SUR LA COLONNE 1 LA PARTIE EST PERDUE
+            console.log(this.user.lose);
+              this.$api.patch(`/players/${this.user.id_player}`, {
+                lose: this.user.lose + 1,
+              })
+              this.user.lose++;
+              this.$api.patch(`/games/${this.getCookie('gid')}`, {
+                status: 'finished',
+              })
+              this.game.status = 'finished';
+              clearInterval(interval);
+              clearInterval(intervalAlienSpeed);
+              setTimeout(() => {
+                this.gameResult = 'lose';
+              }, 3000);
+            }
+          } else {
+            this.$api.patch(`/players/${this.user.id_player}`, {
+              win: this.user.win + 1,
+            })
+            this.user.win++;
+            this.$api.patch(`/games/${this.getCookie('gid')}`, { // SI TOUS LES ALIENS SONT MORTS LA PARTIE EST GAGNÉE
               status: 'finished',
             })
             this.game.status = 'finished';
+            this.$api.patch(`/players/${this.user.id_player}`, {
+              ressources: this.user.ressources + this.level.reward,
+            })
+            this.user.ressources += this.level.reward;
             clearInterval(interval);
             clearInterval(intervalAlienSpeed);
+            setTimeout(() => {
+              this.gameResult = 'win';
+            }, 3000);
           }
-        } else {
-          this.$api.patch(`/games/${this.getCookie('gid')}`, { // SI TOUS LES ALIENS SONT MORTS LA PARTIE EST GAGNÉE
-            status: 'finished',
-          })
-          this.game.status = 'finished';
-          this.$api.patch(`/players/${this.user.id_player}`, {
-            ressources: this.user.ressources + this.level.reward,
-          })
-          this.user.ressources += this.level.reward;
-          clearInterval(interval);
-          clearInterval(intervalAlienSpeed);
         }
       }, speed);
 
       const interval = setInterval(() => {
         if (this.aliensColumn <= 10) { // SI L'ALIEN EST SUR LA LIGNE DU ROBOT, LE ROBOT TIRE SUR L'ALIEN
           this.placedRobot.forEach(robot => {
-            if (robot.row === this.aliens[0].row) {
+            if (this.aliens.length > 0 && robot.row === this.aliens[0].row) {
               for (let i = 0; i < robot.reload_time; i++) {
                 this.filterRedAlien = true;
                 this.shootAlien(robot);
@@ -381,6 +449,10 @@ export default {
             clearInterval(intervalAlienSpeed);
           }
         } else {
+          this.$api.patch(`/players/${this.user.id_player}`, {
+            win: this.user.win + 1,
+          })
+          this.user.win++;
           this.$api.patch(`/games/${this.getCookie('gid')}`, { // SI TOUS LES ALIENS SONT MORTS LA PARTIE EST GAGNÉE
             status: 'finished',
           })
@@ -391,12 +463,14 @@ export default {
           this.user.ressources += this.level.reward;
           clearInterval(interval);
           clearInterval(intervalAlienSpeed);
+          setTimeout(() => {
+            this.gameResult = 'win';
+          }, 3000);
         }
       }, 500);
     },
     async shootAlien(robot) {
-      if (this.aliens[0].row === robot.row && this.aliens.length > 0) {
-        // L'alien attaque le robot s'ils sont adjacents
+      if (this.aliens.length > 0 && this.aliens[0].row === robot.row) { // L'ALIEN ATTQUE LE ROBOT S'ILS SONT ADJACENTS
         this.aliens[0].health -= robot.power;
         this.$api.patch(`/players/${this.user.id_player}`, {
           score: this.user.score + robot.power,
@@ -415,8 +489,22 @@ export default {
         }
       }
     },
+    async getGame() {
+      if(this.getCookie('gid') === null) {
+        this.$router.push('/')
+      } else {
+        await this.$api.get(`/games/${this.getCookie('gid')}`)
+        .then((response) => {
+          store.commit('setGame', response.data);
+          this.getLevel();
+        })
+        .catch((error) => {
+          console.log(error.response.data)
+        })
+      }
+    },
     async getLevel() {
-      if(this.game.id_level === null) {
+      if(this.game.id_level === null || this.game.id_level === undefined) {
         this.$router.push('/')
       } else {
         await this.$api.get(`/levels/${this.game.id_level}`)
@@ -436,9 +524,9 @@ export default {
     this.$api.patch(`/games/${this.getCookie('gid')}`, {
       status: 'not_started',
     })
+    this.getGame();
     if(this.game) {
       this.game.status = 'not_started';
-      this.getLevel();
       this.getAliens();
       this.getRobots();
       this.spawnAliens();
@@ -448,9 +536,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
-// FINISH ANIMATION
-
 .animate-alien {
   animation: fade-alien 0.8s alternate infinite;
 }
