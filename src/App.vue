@@ -19,7 +19,7 @@
       <div class="flex items-center justify-center gap-2 border-white border-[1px] rounded-xl px-3 py-2">
         <img title="Pseudo" class="h-6" src="@/assets/images/player/account.svg">
         <p title="Pseudo" class="font-normal">{{ user.name }}</p>
-        <img title="Ressources" class="h-6" src="@/assets/images/player/ressources.svg">
+        <img title="Ressources" class="h-6 w-6" src="@/assets/images/player/ressources.svg">
         <p title="Ressources" class="font-normal">{{ user.ressources }}</p>
         <img title="Score" class="h-6" src="@/assets/images/player/score.svg">
         <p title="Score" class="font-normal">{{ user.score }}</p>
