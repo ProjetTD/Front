@@ -107,6 +107,8 @@ export default {
         score: 0,
         level: 0,
         ressources: 200,
+        win: 0,
+        lose: 0
       })
       .then((response) => {
         this.setCookie('uid', response.data.id_player);
