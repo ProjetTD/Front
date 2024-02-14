@@ -1,4 +1,4 @@
-<template>
+<template class="custom-scroll">
   <nav class="relative px-6 z-[50]">
     <div class="flex items-center gap-[30px] uppercase">
       <img class="w-[60px]" src="./assets/images/brand/logo.png">
@@ -13,6 +13,12 @@
           <path d="M2 1H20V2H20.94V20H20V21H2V20H1.06V2H2V1M3 3V19H19V3H3M4 4H18V12H4V4M5 14H8V17H5V14M12 15H14V17H12V15M15 14H17V16H15V14Z" />
         </svg>
         <p class="hidden lg:block">Jeux</p>
+      </router-link>
+      <router-link to="/leaderboard">
+        <svg class="h-6 duration-200" fill="#a5a5a5" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-crown">
+          <path d="M2 17H20V19H2V17M4 6L4 7H5L5 8L6 8L6 7H7V6H8V5H9V4L10 4L10 3H12L12 4L13 4V5H14L14 6H15V7H16L16 8H17V7L18 7V6H19V5H20V16H2V5H3V6H4M7 14H18V10H15V9H14V8H13V7H12V6H10V7H9V8H8V9H7V10H4V14H7Z" />
+        </svg>
+        <p class="hidden lg:block">Classement</p>
       </router-link>
     </div>
     <div v-if="user.id_player && user.name" class="flex items-center gap-[30px]">
@@ -32,7 +38,7 @@
       </button>
     </div>
     <div v-else class="flex items-center gap-[30px]">
-      <button v-on:click="popup.show = !popup.show" class="font-normal flex items-center justify-center gap-2 border-white border-[1px] rounded-xl px-2 py-2 hover:text-black hover:bg-white duration-200">
+      <button v-on:click="popup.connect.show = !popup.connect.show" class="font-normal flex items-center justify-center gap-2 border-white border-[1px] rounded-xl px-2 py-2 hover:text-black hover:bg-white duration-200">
         <svg class="h-6" fill="#ffffff" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" id="memory-arrow-right-circle">
           <path d="M7 1H15V2H17V3H18V4H19V5H20V7H21V15H20V17H19V18H18V19H17V20H15V21H7V20H5V19H4V18H3V17H2V15H1V7H2V5H3V4H4V3H5V2H7V1M6 5H5V6H4V8H3V14H4V16H5V17H6V18H8V19H14V18H16V17H17V16H18V14H19V8H18V6H17V5H16V4H14V3H8V4H6V5M10 6H12V7H13V8H14V9H15V10H16V12H15V13H14V14H13V15H12V16H10V14H11V13H12V12H6V10H12V9H11V8H10V6Z" />
         </svg>

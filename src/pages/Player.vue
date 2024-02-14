@@ -61,7 +61,7 @@
         <div v-if="aliens.length > 0 || game.status === 'finished'" class="flex flex-row items-center justify-center gap-2">
           <div class="flex flex-col justify-center gap-2">
             <div v-for="row in 5" :key="row" class="bg-theme-main flex border-white border-[1px] rounded-xl">
-              <div v-for="col in 10" :key="col" class="flex items-center justify-center w-20 h-20">
+              <div v-for="col in 10" :key="col" class="danger-area flex items-center justify-center w-20 h-20">
                 <div v-if="aliens.length > 0 && col === aliensColumn && row === aliens[0].row && game.status !== 'not_started'" class="w-16 h-16 flex flex-col items-center justify-center">
                   <img v-if="aliens.length > 0" :src="getAlienImage(aliens[0].name)" class="-scale-x-[1] w-16 h-16" :class="{ 'filterRedAlien' : filterRedAlien}"/>
                   <div v-if="aliens.length > 0" class="!animate-none flex items-center w-full h-[5px] border-white/30 border-[1px] rounded-3xl">
@@ -108,7 +108,7 @@
   <transition name="fadeTransition">
     <div v-show="gameResult === 'lose' || gameResult === 'win'"
           class="z-[99] justify-center h-full gap-8 flex-col absolute lg:fixed w-full bg-black/90 text-white top-0 left-0 flex items-center text-center">
-      <div class="w-4/5 lg:w-2/5 flex flex-col items-center justify-center border-[1px] border-white/30 rounded-lg p-8 bg-black/70 gap-10">
+      <div class="w-full lg:w-2/5 flex flex-col items-center justify-center border-[1px] border-white/30 rounded-lg p-8 bg-black/70 gap-10">
         <div class="relative w-full flex items-center justify-center gap-4">
           <img class="mt-12 w-10 h-10" src="@/assets/images/player/game_finished.svg" />
           <h1 class="mt-12 font-black text-[1rem] lg:text-[1.5rem] z-10 uppercase">La partie est terminée !</h1>
@@ -120,8 +120,8 @@
         </div>
         <div class="flex items-center flex-col w-full gap-7">
           <span>
-            <i v-if="gameResult === 'win'" class="opacity-80">Vous avez réussi à vaincre tous les aliens ! Grâce à ça, vous avez gagné <b>{{ level.reward }}</b> ressources.</i>
-            <i v-else-if="gameResult === 'lose'" class="opacity-80">Vous avez perdu la partie, les aliens ont réussi à atteindre votre base. Essayez de nouveau pour gagner des ressources !</i>
+            <i v-if="gameResult === 'win'" class="opacity-80"><b class="text-[#3cff00]">Vous avez gagné la partie !</b><br>Vous avez vaincu tous les aliens ! En raison de cette victoire, vous avez gagné <b>{{ level.reward }}</b> ressources.</i>
+            <i v-else-if="gameResult === 'lose'" class="opacity-80"><b class="text-[#ff2f05]">Vous avez perdu la partie !</b><br>Les aliens ont réussi à atteindre votre base. Essayez de nouveau pour gagner des ressources !</i>
             <div class="relative w-full flex items-center justify-center gap-2">
               <img class="mt-12 w-7 h-7" src="@/assets/images/player/stats.svg" />
               <h1 class="mt-12 font-black text-[0.6rem] lg:text-[1.2rem] z-10 uppercase">Statistiques globales</h1>
@@ -131,6 +131,37 @@
             <p class="font-medium opacity-60">Vous avez gagné <b>{{ user.win }}</b> {{ user.win > 1 ? 'parties' : 'partie' }}.</p>
             <p class="font-medium opacity-60">Vous avez perdu <b>{{ user.lose }}</b> {{ user.lose > 1 ? 'parties' : 'partie' }}.</p>
             <p class="font-medium opacity-60">Vous avez <b>{{ user.ressources }}</b> {{ user.ressources > 1 ? 'ressources' : 'ressource' }}.</p>
+          </span>
+        </div>
+      </div>
+    </div>
+  </transition>
+  <transition name="fadeTransition">
+    <div v-show="popup.tutorial.show"
+          class="z-[99] justify-center h-full gap-8 flex-col absolute lg:fixed w-full bg-black/90 text-white top-0 left-0 flex items-center text-center">
+      <div class="w-4/5 lg:w-2/5 flex flex-col items-center justify-center border-[1px] border-white/30 rounded-lg p-8 bg-black/70 gap-10">
+        <div class="relative w-full flex items-center justify-center gap-2">
+          <img class="mt-12 w-10 h-8" src="@/assets/images/player/tutorial.svg" />
+          <h1 class="mt-12 font-black text-[1rem] lg:text-[1.5rem] z-10 uppercase">Tutoriel du jeu</h1>
+          <button
+            class="absolute top-0 left-0 w-8 rounded-md border border-gray-500 h-8 bg-black/70 hover:border-white duration-200"
+            v-on:click="popup.tutorial.show = !popup.tutorial.show">
+            <img src="@/assets/images/player/cross.svg" />
+          </button>
+        </div>
+        <div class="flex items-center flex-col w-full gap-7">
+          <span>
+            <i class="opacity-80">Appuyez sur la croix pour fermer le tutoriel.</i>
+            <br>
+            <br>
+            <p class="font-semibold">Avant de démarrer, <a class="text-[#ffd700]">achetez</a> un robot dans la boutique puis <a class="text-[#ffd700]">placez-le</a> pour commencer la partie.</p>
+            <br>
+            <p class="text-[#ff2f05] font-semibold">Si un alien atteint la zone rouge, vous perdez la partie !</p>
+          </span>
+          <span>
+            <video width="740" height="556" autoplay loop onloadstart="this.volume=0" class="rounded-lg border-white border-[1px]">
+              <source src="@/assets/images/player/video/tutorial_1.mp4" type=video/mp4>
+            </video>
           </span>
         </div>
       </div>
@@ -175,6 +206,9 @@ export default {
     },
     level() {
       return store.state.level;
+    },
+    popup() {
+      return store.state.popup;
     }
   },
   methods: {
@@ -195,12 +229,13 @@ export default {
       return (alien.health / maxHealth) * 100 + '%';
     },
     getMaxHealthByAlienType(alienType) {
+      console.log(alienType);
       switch (alienType) {
         case 'Normal':
           return this.defaultAliens[0].health;
-        case 'Runner':
-          return this.defaultAliens[1].health;
         case 'Tank':
+          return this.defaultAliens[1].health;
+        case 'Runner':
           return this.defaultAliens[2].health;
         default:
           return 100;
@@ -247,7 +282,7 @@ export default {
       const alreadyOccupied = this.placedRobot.some(robot => robot.row === row && robot.column === column);
       if (!alreadyOccupied) {
         if (this.user.ressources >= this.selectedRobotCost) {
-          if (this.robotsColumn >= 1 && this.robotsColumn <= 4) {
+          if (this.robotsColumn >= 1 && this.robotsColumn <= 3) {
             this.user.ressources -= this.selectedRobotCost;
             this.$api.patch(`/players/${this.user.id_player}`, {
               ressources: this.user.ressources,
@@ -358,7 +393,7 @@ export default {
 
       const intervalAlienSpeed = setInterval(() => {
         if (this.aliens.length > 0) {
-          const robotOnSameRow = this.placedRobot.find(robot => robot.row === this.aliens[0].row && robot.row <= this.robotsColumn + 1);
+          const robotOnSameRow = this.placedRobot.find(robot => robot.row === this.aliens[0].row);
           const robotOnSameColumn = this.placedRobot.find(robot => robot.row === this.aliens[0].row && robot.column + 1 === this.aliensColumn);
           if (!robotOnSameRow || this.aliensColumn > 1 && !robotOnSameColumn) {
             this.aliensColumn--;
@@ -517,7 +552,8 @@ export default {
       }
     },
   },
-  mounted() {
+  async beforeMount() {
+    this.popup.tutorial.show = true;
     if(!this.getCookie('uid')) {
       this.$router.push('/');
     }
@@ -525,17 +561,42 @@ export default {
       status: 'not_started',
     })
     this.getGame();
-    if(this.game) {
-      this.game.status = 'not_started';
-      this.getAliens();
-      this.getRobots();
-      this.spawnAliens();
-    }
+    await this.getAliens();
+    this.game.status = 'not_started';
+    this.$api.patch(`/players/${this.user.id_player}`, {
+      ressources: 200,
+    })
+    this.user.ressources = 200;
+    this.getRobots();
+    this.spawnAliens();
   }
 }
 </script>
 
 <style scoped lang="scss">
+.danger-area:first-child::after {
+  content: '';
+  position: absolute;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 10px;
+  background: rgb(195,0,0);
+  background: linear-gradient(90deg, rgba(195,0,0,0.8688725490196079) 0%, rgba(0,0,0,0) 90%);
+  animation: danger 2s infinite;
+}
+
+@keyframes danger {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
 .animate-alien {
   animation: fade-alien 0.8s alternate infinite;
 }

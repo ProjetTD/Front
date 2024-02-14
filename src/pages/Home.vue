@@ -34,7 +34,7 @@
       </div>
     </div>
     <transition name="fadeTransition">
-      <div v-show="popup.show"
+      <div v-show="popup.connect.show"
            class="z-[99] justify-center h-full gap-8 flex-col absolute lg:fixed w-full bg-black/95 text-white top-0 left-0 flex items-center text-center">
         <div class="w-4/5 lg:w-2/5 flex flex-col items-center justify-center border-[1px] border-white/30 rounded-lg p-8 bg-black/70 gap-10">
           <div class="relative w-full flex items-center justify-center gap-4">
@@ -42,7 +42,7 @@
             <h1 class="mt-12 font-black text-[1rem] lg:text-[1.5rem] z-10 uppercase">Création de la partie</h1>
             <button
               class="absolute top-0 left-0 w-8 rounded-md border border-gray-500 h-8 bg-black/70 hover:border-white duration-200"
-              v-on:click="popup.show = !popup.show">
+              v-on:click="popup.connect.show = !popup.connect.show">
               <img src="@/assets/images/player/cross.svg" />
             </button>
           </div>
@@ -133,7 +133,7 @@ export default {
               }
             })
 
-            this.popup = false;
+            this.popup.connect.show = false;
           })
         } else {
           console.log(error.response.data)

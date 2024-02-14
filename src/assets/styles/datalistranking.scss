@@ -1,0 +1,149 @@
+.datalistranking {
+  @apply text-white;
+
+  tbody tr {
+    :not(:first-child) {
+      font-weight: 600;
+    }
+
+    th:not(:nth-child(n+2)) span::first-letter {
+      color: rgba(146, 19, 48, 1);
+    }
+  }
+
+  thead tr:first-child {
+    th:first-child {
+      border-top-left-radius: 10px;
+    }
+    th:last-child {
+      border-top-right-radius: 10px;
+    }
+  }
+  
+  tbody tr:last-child {
+    th:first-child {
+      border-bottom-left-radius: 10px;
+    }
+    th:last-child {
+      border-bottom-right-radius: 10px;
+    }
+  }
+
+  th {
+    @apply py-3 px-3 w-[11%] transition-all ease-in-out;
+
+    span {
+      @apply transition-all
+    }
+
+    div {
+      @apply flex flex-row gap-6 flex items-center justify-center w-full mr-2;
+    }
+
+    &:first-child {
+      div {
+        @apply justify-center ml-0;
+      }
+    }
+
+    &:last-child {
+      div {
+        @apply justify-center mr-0;
+      }
+
+      * {
+        @apply float-right;
+      }
+    }
+  }
+
+  .orderList0 {
+    :not(:first-child) {
+      color: #FFA930;
+    }
+
+    th:nth-child(1) {
+      color: white;
+    }
+
+    th:first-child span::first-letter {
+      color: #FFA930;
+    }
+  }
+
+  .orderList1 {
+    :not(:first-child) {
+      color: #999999;
+    }
+
+    th:nth-child(1) {
+      color: white;
+    }
+
+    th:first-child span::first-letter {
+      color: #999999;
+    }
+  }
+
+  .orderList2 {
+    :not(:first-child) {
+      color: #C45900;
+    }
+
+    th:nth-child(1) {
+      color: white;
+    }
+
+    th:first-child span::first-letter {
+      color: #C45900;
+    }
+  }
+
+  thead {
+    @apply uppercase font-black;
+    th {
+      @apply bg-black/100;
+    }
+  }
+
+  th:has(span.boldGrade) {
+    background: #2C2C2C;
+  }
+
+  .boldGrade {
+    color: white !important;
+    font-weight: 900;
+  }
+
+  .colorRank {
+    color: rgba(146, 19, 48, 1);
+  }
+
+
+  tbody {
+    th {
+      @apply bg-black/70;
+    }
+    th:not(:first-child) {
+      border-left: 1px solid #2C2C2C;
+    }
+
+    th:nth-child(5) {
+      background: #111111be;
+      color: rgb(207, 207, 207);
+      font-weight: 900;
+    }
+
+    th:nth-child(1) {
+      font-weight: 900;
+    }
+
+    tr {
+      @apply text-white/40 px-4;
+
+      &:hover span {
+        color: white;
+      }
+    }
+  }
+}

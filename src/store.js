@@ -6,7 +6,12 @@ export default createStore({
     game: {},
     level: {},
     popup: {
-      show: false,
+      connect: {
+        show: false,
+      },
+      tutorial: {
+        show: false,
+      }
     },
   },
   mutations: {
